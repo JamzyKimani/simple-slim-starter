@@ -2,5 +2,5 @@
 
 return [
 	'cache' => base_path('cache'),
-	'view' => base_path('views')
+	'views' => base_path('views')
 ];

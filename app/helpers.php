@@ -335,6 +335,7 @@ if (! function_exists('data_set')) {
 
 if(!function_exists('view')){
     function view(Response $response, $template, $data = []){
+        
         $cache = config('blade.cache');
         $views = config('blade.views');
         $blade = (new Blade($views, $cache))->make($template, $data);
