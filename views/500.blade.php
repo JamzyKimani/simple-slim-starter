@@ -6,6 +6,7 @@
   <title>Home</title>
 </head>
 <body>
-   @yield('content')
+   <H1>Opps something went wrong!</H1>
+   <p>error 500</p>
 </body>
 </html>

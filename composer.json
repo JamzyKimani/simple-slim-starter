@@ -1,5 +1,5 @@
 {   
-    "name":"simple-slim-starter",
+    "name":"jamzykimani/simple-slim-starter",
     "description":"A simple Slim Framework starter template with Medoo Database Framework and Blade templating engine setup",
     "keywords": ["Slim Framework", "Blade Templating Engine", "PHP-DI", "slim-bridge", "Medoo Database Framework"],
     "require": {
@@ -14,7 +14,8 @@
         "illuminate/support": "^8.83",
         "zeuxisoo/slim-whoops": "^0.7.3",
         "vlucas/phpdotenv": "^5.4",
-        "catfan/medoo": "^2.1"
+        "catfan/medoo": "^2.1",
+        "flynsarmy/slim-monolog": "^1.0"
     }, 
     "autoload": {
         "files": [

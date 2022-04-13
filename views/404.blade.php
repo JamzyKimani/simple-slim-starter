@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,6 +7,6 @@
   <title>Home</title>
 </head>
 <body>
-   @yield('content')
+   <H1>Page not found!</H1>
 </body>
 </html>

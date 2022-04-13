@@ -4,3 +4,4 @@ vendor
 .env
 .vagrant
 node_modules
+logs/*.log
