@@ -18,8 +18,7 @@ class LoggerServiceProvider extends ServiceProvider
                 $processor = new UidProcessor();
                 $logger->pushProcessor($processor);
     
-                $handler = new StreamHandler($loggerSettings['path'], $loggerSettings['level']);
-                
+                $handler = new StreamHandler($loggerSettings['path'], $loggerSettings['level']);                
                 $logger->pushHandler($handler);
     
                 return $logger;

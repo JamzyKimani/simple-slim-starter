@@ -33,7 +33,9 @@ class ErrorMiddlewareServiceProvider extends ServiceProvider
                 bool $logErrors,
                 bool $logErrorDetails,
                 ?LoggerInterface $logger = null
-            ) use ($app) {
+            ) 
+            use ($app) 
+            {
                 //logger supplied by logger service provider
                 $logger = $app->getContainer()->get(LoggerInterface::class);
                 $logger->error($exception->getMessage());
@@ -49,11 +51,8 @@ class ErrorMiddlewareServiceProvider extends ServiceProvider
 
             // Add Error Middleware
             $errorSettings = config('app.errors');
-
             $errorMiddleware = $app->addErrorMiddleware($errorSettings['displayErrorDetails'],$errorSettings['logError'],$errorSettings['logErrorDetails']);
             $errorMiddleware->setDefaultErrorHandler($customErrorHandler);
-
-
         }
 
     }

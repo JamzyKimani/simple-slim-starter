@@ -8,97 +8,24 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 
-
-
-if (!function_exists('back'))
-{
-    function back()
-    {
-        $route = app()->resolve(\App\Support\RequestInput::class);
-
-        $back = $route->getCurrentUri();
-
-        return redirect($back);
-    }
-}
-
-if (!function_exists('session'))
-{
-    function session($key = false, $value = false)
-    {
-        $session = app()->resolve(\Boot\Foundation\Http\Session::class);
-
-        if (!$key) {
-            return $session;
-        }
-
-        if (!$value) {
-            return $session->get($key);
-        }
-
-        $session->set($key, $value);
-
-        return $session;
-    }
-}
-
-if (!function_exists('validator'))
-{
-    function validator(array $input, array $rules, array $messages = [])
-    {
-        $factory = app()->resolve(\Boot\Foundation\Http\ValidatorFactory::class);
-
-        return $factory->make($input, $rules, $messages);
-    }
-}
-
-if (!function_exists('asset'))
-{
-    function asset($path)
-    {
-        return env('APP_URL') . "/{$path}";
-    }
-}
-
-if (!function_exists('redirect'))
-{
-    function redirect(string $to)
-    {
-        $redirect = app()->resolve(\App\Support\Redirect::class);
-
-        return $redirect($to);
-    }
-}
-if (!function_exists('collect'))
-{
-    function collect($items)
-    {
-        return new Collection($items);
-    }
-}
-
-if (!function_exists('factory'))
-{
-    function factory(string $model, int $count = 1)
-    {
-        $factory = new Factory;
-
-        return $factory($model, $count);
-    }
-}
-
-if (!function_exists('env'))
-{
-    function env($key, $default = false)
-    {
-        $value = getenv($key);
-
-        throw_when(!$value and !$default, "{$key} is not a defined .env variable and has not default value");
-
-        return $value or $default;
-    }
-}
-
+/*
+ * base_path
+ * config_path
+ * resources_path
+ * public_path
+ * routes_path
+ * storage_path
+ * app_path
+ * dd (die and dump)
+ * throw_when
+ * class_basename
+ * config
+ * data_get
+ * data_set
+ * asset
+ * view
+ * env
+ */
 
 if (!function_exists('base_path'))
 {
@@ -107,16 +34,6 @@ if (!function_exists('base_path'))
         return  __DIR__ . "/../{$path}";
     }
 }
-
-/*
-if (!function_exists('database_path'))
-{
-    function database_path($path = '')
-    {
-        return base_path("database/{$path}");
-    }
-}
-*/
 
 if (!function_exists('config_path'))
 {
@@ -142,13 +59,6 @@ if (!function_exists('public_path'))
     }
 }
 
-if (!function_exists('resources_path'))
-{
-    function resources_path($path = '')
-    {
-        return base_path("resources/{$path}");
-    }
-}
 
 if (!function_exists('routes_path'))
 {
@@ -205,19 +115,18 @@ if (!function_exists('config'))
     function config($path = null)
     {
         $config = [];
-
         $folder = scandir(config_path());
-
         $config_files = array_slice($folder, 2, count($folder));
 
-        foreach ( $config_files as $file) 
+        foreach ($config_files as $file)
         {
-        	throw_when(
-        		Str::after($file, '.') !== 'php',
-        		'Config files must be .php files'
-        	);
+            throw_when(
+                Str::after($file, '.') !== 'php',
+                'Config files must be .php files'
+            );
 
-        	data_set($config, Str::before($file, '.php'), require config_path($file));
+
+            data_set($config, Str::before($file, '.php') , require config_path($file));
         }
 
         return data_get($config, $path);
@@ -333,8 +242,18 @@ if (! function_exists('data_set')) {
     }
 }
 
-if(!function_exists('view')){
-    function view(Response $response, $template, $data = []){
+if (!function_exists('asset'))
+{
+    function asset($path)
+    {
+        return env('APP_URL') . "/{$path}";
+    }
+}
+
+if(!function_exists('view'))
+{
+    function view(Response $response, $template, $data = [])
+    {
         
         $cache = config('blade.cache');
         $views = config('blade.views');
@@ -345,3 +264,16 @@ if(!function_exists('view')){
 
     }
 }
+
+if (!function_exists('env'))
+{
+    function env($key, $default = false)
+    {
+        $value = getenv($key);
+
+        throw_when(!$value and !$default, "{$key} is not a defined .env variable and has not default value");
+
+        return $value or $default;
+    }
+}
+
