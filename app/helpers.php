@@ -1,37 +1,136 @@
 <?php
-/** GLOBAL HELPER FUNCTIONS **/
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+
+use App\Container;
+
+use Pecee\SimpleRouter\SimpleRouter as Router;
+use Pecee\Http\Url;
+use Pecee\Http\Response;
+use Pecee\Http\Request;
 use Jenssegers\Blade\Blade;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 
-/*
- * base_path
- * config_path
- * resources_path
- * public_path
- * routes_path
- * storage_path
- * app_path
- * dd (die and dump)
- * throw_when
- * class_basename
- * config
- * data_get
- * data_set
- * asset
- * view
- * env
+/**
+ * Get url for a route by using either name/alias, class or method name.
+ *
+ * The name parameter supports the following values:
+ * - Route name
+ * - Controller/resource name (with or without method)
+ * - Controller class name
+ *
+ * When searching for controller/resource by name, you can use this syntax "route.name@method".
+ * You can also use the same syntax when searching for a specific controller-class "MyController@home".
+ * If no arguments is specified, it will return the url for the current loaded route.
+ *
+ * @param string|null $name
+ * @param string|array|null $parameters
+ * @param array|null $getParams
+ * @return \Pecee\Http\Url
+ * @throws \InvalidArgumentException
  */
+function url(?string $name = null, $parameters = null, ?array $getParams = null): Url
+{
+    return Router::getUrl($name, $parameters, $getParams);
+}
+
+/**
+ * @return \Pecee\Http\Response
+ */
+function response(): Response
+{
+    return Router::response();
+}
+
+/**
+ * @return \Pecee\Http\Request
+ */
+function request(): Request
+{
+    return Router::request();
+}
+
+/**
+ * Get input class
+ * @param string|null $index Parameter index name
+ * @param string|null $defaultValue Default return value
+ * @param array ...$methods Default methods
+ * @return \Pecee\Http\Input\InputHandler|array|string|null
+ */
+function input($index = null, $defaultValue = null, ...$methods)
+{
+    if ($index !== null) {
+        return request()->getInputHandler()->value($index, $defaultValue, ...$methods);
+    }
+
+    return request()->getInputHandler();
+}
+
+/**
+ * @param string $url
+ * @param int|null $code
+ */
+function redirect(string $url, ?int $code = null): void
+{
+    if ($code !== null) {
+        response()->httpCode($code);
+    }
+
+    response()->redirect($url);
+}
+
+/**
+ * Get current csrf-token
+ * @return string|null
+ */
+function csrf_token(): ?string
+{
+    $baseVerifier = Router::router()->getCsrfVerifier();
+    if ($baseVerifier !== null) {
+        return $baseVerifier->getTokenProvider()->getToken();
+    }
+
+    return null;
+}
+
+if(!function_exists('csrf_field')){
+    function csrf_field() {
+        return '<input type="hidden" name="csrf_token" value="'.csrf_token().'" />';
+    }
+}
+
+
+/**
+ * render a blade template
+ * @return string|null
+ */
+if(!function_exists('view')){
+    function view($template, $data = [])
+    {
+        $cache = config('blade.cache');
+        $views = config('blade.views');
+        
+        $blade = (new Blade($views, $cache))->make($template, $data);
+        return $blade->render();
+
+    }
+}
 
 if (!function_exists('base_path'))
 {
     function base_path($path = '')
     {
         return  __DIR__ . "/../{$path}";
+    }
+}
+
+
+if (!function_exists('database_path'))
+{
+    function database_path($path = '')
+    {
+        return base_path("database/{$path}");
     }
 }
 
@@ -59,6 +158,13 @@ if (!function_exists('public_path'))
     }
 }
 
+if (!function_exists('resources_path'))
+{
+    function resources_path($path = '')
+    {
+        return base_path("resources/{$path}");
+    }
+}
 
 if (!function_exists('routes_path'))
 {
@@ -73,6 +179,15 @@ if (!function_exists('app_path'))
     function app_path($path = '')
     {
         return base_path("app/{$path}");
+    }
+}
+
+
+if (!function_exists('asset'))
+{
+    function asset($path)
+    {
+        return env('APP_URL') . "/assets/{$path}";
     }
 }
 
@@ -110,23 +225,23 @@ if (! function_exists('class_basename')) {
     }
 }
 
+
 if (!function_exists('config'))
 {
     function config($path = null)
     {
         $config = [];
+
         $folder = scandir(config_path());
         $config_files = array_slice($folder, 2, count($folder));
 
-        foreach ($config_files as $file)
-        {
-            throw_when(
+        foreach ($config_files as $file) {
+            throw_when (
                 Str::after($file, '.') !== 'php',
                 'Config files must be .php files'
             );
 
-
-            data_set($config, Str::before($file, '.php') , require config_path($file));
+            data_set($config, Str::before($file, '.php'), require config_path($file));
         }
 
         return data_get($config, $path);
@@ -242,28 +357,6 @@ if (! function_exists('data_set')) {
     }
 }
 
-if (!function_exists('asset'))
-{
-    function asset($path)
-    {
-        return env('APP_URL') . "/{$path}";
-    }
-}
-
-if(!function_exists('view'))
-{
-    function view(Response $response, $template, $data = [])
-    {
-        
-        $cache = config('blade.cache');
-        $views = config('blade.views');
-        $blade = (new Blade($views, $cache))->make($template, $data);
-        $response->getBody()->write($blade->render());
-
-        return $response;
-
-    }
-}
 
 if (!function_exists('env'))
 {
@@ -277,3 +370,80 @@ if (!function_exists('env'))
     }
 }
 
+if(! function_exists('container')) {
+    /**
+     * Get/Set a config value
+     * 
+     * @param   string  $key
+     * @param   mixed   $value
+     * @return  mixed
+     */
+    function container($key, $value = null) {
+        $container = Container::getInstance($key);
+        if ( is_null($value) ) {
+            return $container->get($key);
+        } else {
+            return $container->set($key, $value);
+        }
+    }
+}
+
+if (! function_exists('cookie')) {
+    /**
+     * Get/Set a cookie
+     * 
+     * @param   string  $key
+     * @param   mixed   $value
+     * @param   float   $days
+     * @return  mixed
+     */
+    function cookie($key, $value = null, $days = 1) {
+        if ( is_null($value) ) {
+            return isset($_COOKIE[$key]) ? $_COOKIE[$key] : null;
+        } else {
+            return setcookie($key, $value, time() + (86400 * $days), '/');
+        }
+    }
+}
+
+if (! function_exists('session')) {
+    /**
+     * Get the current session
+     * 
+     * @param   mixed   $key
+     * @param   mixed   $value
+     * @return  mixed
+     */
+    function session($key = null, $value = null) {
+        $session = container(Session::class);
+        if ( is_null($key) ) {
+            return $session;
+        } else if ( is_null($value) ) {
+            return $session->get($key);
+        } else {
+            $session->put($key, $value);
+        }        
+    }
+}
+
+if (! function_exists('array_to_csv_download')) {
+    /**
+     * Get the current session
+     * 
+     * @param   array   $array an array you want to download as csv
+     * @param   string  $filename of the file that will be created
+     * @return  string  $delimiter csv delimiter ; or ,
+     */
+    function array_to_csv_download($array, $filename = "export.csv", $delimiter=";") {
+        header('Content-Type: application/csv');
+        header('Content-Disposition: attachment; filename="'.$filename.'";');
+    
+        // open the "output" stream
+        // see http://www.php.net/manual/en/wrappers.php.php#refsect2-wrappers.php-unknown-unknown-unknown-descriptioq
+        $f = fopen('php://output', 'w');
+    
+        foreach ($array as $line) {
+            fputcsv($f, $line, $delimiter);
+        }
+    }   
+}

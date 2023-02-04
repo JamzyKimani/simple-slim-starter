@@ -1,6 +1,6 @@
-<?php 
-
+<?php
+ 
 return [
 	'cache' => base_path('cache'),
-	'views' => base_path('views')
+	'views' => base_path('views') 
 ];

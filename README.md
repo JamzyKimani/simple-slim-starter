@@ -1,2 +1,6 @@
-# simple-slim-starter
-A simple PHP Slim Framework starter template with Medoo Database engine, Monolog logger and Blade templating engine setup
+# Election System
+
+## Notes
+
+Election system for conducting nominations and voting online
+

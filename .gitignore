@@ -1,7 +1,9 @@
-cache/*.php
 vendor
-.idea
-.env
-.vagrant
-node_modules
+.idea/
+todo.php
+public/assets/app_files
+storage/cache
 logs/*.log
+cache/*.php
+.env
+node_modules

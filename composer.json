@@ -1,33 +1,28 @@
-{   
-    "name":"jamzykimani/simple-slim-starter",
-    "description":"A simple Slim Framework starter template with Medoo Database Framework and Blade templating engine setup",
-    "keywords": ["Slim Framework", "Blade Templating Engine", "PHP-DI", "slim-bridge", "Medoo Database Framework"],
-    "require": {
-        "slim/slim": "4.*",
-        "slim/psr7": "^1.5",
-        "php": "^7.4",
-        "ext-curl": "*",
-        "ext-json": "*",
-        "php-di/php-di": "^6.3",
-        "php-di/slim-bridge": "^3.2",
-        "jenssegers/blade": "^1.4",
-        "illuminate/support": "^8.83",
-        "zeuxisoo/slim-whoops": "^0.7.3",
-        "vlucas/phpdotenv": "^5.4",
-        "catfan/medoo": "^2.1",
-        "flynsarmy/slim-monolog": "^1.0"
-    }, 
+{
+ 	"name": "kimanijames/elections-system",
+ 	"description": "Simple system for conducting candidate nominations and elections online",
+ 	"keywords": [
+		"online election portal",
+		"php"
+	],
+	"license": "MIT",
+	"type": "project",
+	"require": {
+		"php": ">=7.1",
+		"pecee/simple-router": "^4.0",
+ 	 	"jenssegers/blade": "^1.4",
+ 	 	"vlucas/phpdotenv": "^5.4",
+ 	 	"php-di/php-di": "^6.4",
+ 	 	"catfan/medoo": "^2.1",
+ 	 	"monolog/monolog": "^2.5",
+ 	 	"firebase/php-jwt": "^6.3"
+	},
+	"config": {
+		"preferred-install": "dist"
+	},
     "autoload": {
-        "files": [
-            "./app/helpers.php"
-        ],
-        "psr-4": {
-            "App\\": "app"
-        }
-    }, 
-    "scripts": {
-        "post-root-package-install": [
-            "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-        ]
+      "psr-4": {
+        "App\\": "app/"
+      }
     }
 }
